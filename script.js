@@ -9,8 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSlide = 0;
     let selectedText = null;
     let isDragging = false;
+    let isSliding = false;
     let startX, startY, initialX, initialY;
-    let isSwiping = false;
+    let slideStartX;
 
     // Slider Navigation
     function updateSlider() {
@@ -29,46 +30,61 @@ document.addEventListener('DOMContentLoaded', () => {
         deselectText();
     });
 
-    // Touch Events for Swiping
-    let touchStartX = 0;
-    let touchEndX = 0;
+    // Image Sliding Functionality
+    slider.addEventListener('mousedown', startSliding);
+    slider.addEventListener('touchstart', startSliding, { passive: true });
 
-    slider.addEventListener('touchstart', (e) => {
-        // Only start swiping if we're not touching a text element
-        if (!e.target.closest('.draggable-text')) {
-            touchStartX = e.changedTouches[0].screenX;
-            isSwiping = true;
-        }
-    });
+    function startSliding(e) {
+        // Don't start sliding if we're interacting with text
+        if (e.target.closest('.draggable-text')) return;
 
-    slider.addEventListener('touchmove', (e) => {
-        if (isSwiping) {
-            e.preventDefault(); // Prevent scrolling while swiping
-        }
-    }, { passive: false });
+        isSliding = true;
+        const touch = e.type === 'touchstart' ? e.touches[0] : e;
+        slideStartX = touch.clientX;
+        slider.style.transition = 'none';
+    }
 
-    slider.addEventListener('touchend', (e) => {
-        if (isSwiping) {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-            isSwiping = false;
-        }
-    });
+    function handleSliding(e) {
+        if (!isSliding) return;
 
-    function handleSwipe() {
-        const swipeThreshold = 50;
-        const diff = touchStartX - touchEndX;
-
-        if (Math.abs(diff) > swipeThreshold) {
-            if (diff > 0 && currentSlide < slides.length - 1) {
-                currentSlide++;
-            } else if (diff < 0 && currentSlide > 0) {
-                currentSlide--;
-            }
-            updateSlider();
-            deselectText();
+        const touch = e.type === 'touchmove' ? e.touches[0] : e;
+        const deltaX = touch.clientX - slideStartX;
+        const movePercent = (deltaX / slider.offsetWidth) * 100;
+        const translate = -(currentSlide * 33.333) + (movePercent / 3);
+        
+        // Limit the sliding range
+        if (translate <= 0 && translate >= -66.666) {
+            slider.style.transform = `translateX(${translate}%)`;
         }
     }
+
+    function endSliding(e) {
+        if (!isSliding) return;
+        
+        isSliding = false;
+        slider.style.transition = 'transform 0.3s ease-in-out';
+        
+        const touch = e.type === 'touchend' ? e.changedTouches[0] : e;
+        const deltaX = touch.clientX - slideStartX;
+        const movePercent = Math.abs((deltaX / slider.offsetWidth) * 100);
+
+        if (movePercent > 10) { // 10% threshold for slide change
+            if (deltaX > 0 && currentSlide > 0) {
+                currentSlide--;
+            } else if (deltaX < 0 && currentSlide < slides.length - 1) {
+                currentSlide++;
+            }
+        }
+        
+        updateSlider();
+        deselectText();
+    }
+
+    // Add mouse/touch event listeners for sliding
+    document.addEventListener('mousemove', handleSliding);
+    document.addEventListener('touchmove', handleSliding, { passive: true });
+    document.addEventListener('mouseup', endSliding);
+    document.addEventListener('touchend', endSliding);
 
     // Text Creation and Management
     addTextBtn.addEventListener('click', () => {
@@ -79,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         newText.style.left = '50%';
         newText.style.top = '50%';
         newText.style.transform = 'translate(-50%, -50%)';
+        newText.style.width = 'auto';
         currentTextContainer.appendChild(newText);
         
         makeTextDraggable(newText);
@@ -104,6 +121,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const rect = this.getBoundingClientRect();
         initialX = rect.left;
         initialY = rect.top;
+
+        // Store the original width to maintain it during dragging
+        this.style.width = `${rect.width}px`;
 
         document.addEventListener('mousemove', drag);
         document.addEventListener('touchmove', drag, { passive: false });
@@ -136,11 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let newX = initialX - containerRect.left + deltaX;
         let newY = initialY - containerRect.top + deltaY;
 
-        // Get element dimensions without transform
-        element.style.transform = 'none';
-        const elementWidth = element.offsetWidth;
-        const elementHeight = element.offsetHeight;
-        element.style.transform = 'translate(-50%, -50%)';
+        // Get element dimensions
+        const elementWidth = elementRect.width;
+        const elementHeight = elementRect.height;
 
         // Constrain to container bounds, accounting for element size
         newX = Math.max(elementWidth/2, Math.min(newX, containerRect.width - elementWidth/2));
@@ -152,6 +170,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function stopDragging() {
         isDragging = false;
+        if (selectedText) {
+            // Reset width to auto after dragging
+            selectedText.style.width = 'auto';
+        }
         document.removeEventListener('mousemove', drag);
         document.removeEventListener('touchmove', drag);
         document.removeEventListener('mouseup', stopDragging);
@@ -226,6 +248,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('underline-btn').addEventListener('click', () => {
         if (selectedText) {
             selectedText.style.textDecoration = selectedText.style.textDecoration === 'underline' ? 'none' : 'underline';
+        }
+    });
+
+    // Delete text functionality
+    document.getElementById('delete-btn').addEventListener('click', () => {
+        if (selectedText) {
+            selectedText.remove();
+            selectedText = null;
+            textEditor.style.display = 'none';
         }
     });
 

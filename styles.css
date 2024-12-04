@@ -13,6 +13,9 @@ body {
     max-width: 100%;
     margin: 0 auto;
     padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .slider-container {
@@ -58,8 +61,10 @@ body {
     cursor: move;
     user-select: none;
     pointer-events: auto;
-    background-color: rgba(255, 255, 255, 0.1);
+    /* background-color: rgba(255, 255, 255, 0.1); */
     border: 1px dashed transparent;
+    white-space: nowrap;
+    min-width: fit-content;
 }
 
 .draggable-text:hover {
@@ -91,8 +96,13 @@ body {
 }
 
 .controls {
+    width: 50%;
     margin-top: 20px;
     text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .text-editor {
@@ -110,6 +120,15 @@ body {
     padding: 5px 10px;
     border: 1px solid #ddd;
     border-radius: 3px;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
 }
 
 #add-text-btn {
