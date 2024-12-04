@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedText = null;
     let isDragging = false;
     let startX, startY, initialX, initialY;
+    let isSwiping = false;
 
     // Slider Navigation
     function updateSlider() {
@@ -33,12 +34,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let touchEndX = 0;
 
     slider.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
+        // Only start swiping if we're not touching a text element
+        if (!e.target.closest('.draggable-text')) {
+            touchStartX = e.changedTouches[0].screenX;
+            isSwiping = true;
+        }
     });
 
+    slider.addEventListener('touchmove', (e) => {
+        if (isSwiping) {
+            e.preventDefault(); // Prevent scrolling while swiping
+        }
+    }, { passive: false });
+
     slider.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
+        if (isSwiping) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+            isSwiping = false;
+        }
     });
 
     function handleSwipe() {
@@ -73,11 +87,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function makeTextDraggable(element) {
         element.addEventListener('mousedown', startDragging);
-        element.addEventListener('touchstart', startDragging);
+        element.addEventListener('touchstart', startDragging, { passive: false });
     }
 
     function startDragging(e) {
         if (e.target !== this) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
         
         isDragging = true;
         const touch = e.type === 'touchstart' ? e.touches[0] : e;
@@ -89,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initialY = rect.top;
 
         document.addEventListener('mousemove', drag);
-        document.addEventListener('touchmove', drag);
+        document.addEventListener('touchmove', drag, { passive: false });
         document.addEventListener('mouseup', stopDragging);
         document.addEventListener('touchend', stopDragging);
 
@@ -100,6 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isDragging) return;
 
         e.preventDefault();
+        e.stopPropagation();
+        
         const touch = e.type === 'touchmove' ? e.touches[0] : e;
         
         const currentX = touch.clientX;
@@ -109,14 +128,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const deltaY = currentY - startY;
 
         const element = selectedText;
-        const containerRect = element.parentElement.getBoundingClientRect();
-        
+        const container = element.parentElement;
+        const containerRect = container.getBoundingClientRect();
+        const elementRect = element.getBoundingClientRect();
+
+        // Calculate new position relative to the container
         let newX = initialX - containerRect.left + deltaX;
         let newY = initialY - containerRect.top + deltaY;
 
-        // Constrain to container bounds
-        newX = Math.max(0, Math.min(newX, containerRect.width - element.offsetWidth));
-        newY = Math.max(0, Math.min(newY, containerRect.height - element.offsetHeight));
+        // Get element dimensions without transform
+        element.style.transform = 'none';
+        const elementWidth = element.offsetWidth;
+        const elementHeight = element.offsetHeight;
+        element.style.transform = 'translate(-50%, -50%)';
+
+        // Constrain to container bounds, accounting for element size
+        newX = Math.max(elementWidth/2, Math.min(newX, containerRect.width - elementWidth/2));
+        newY = Math.max(elementHeight/2, Math.min(newY, containerRect.height - elementHeight/2));
 
         element.style.left = `${newX}px`;
         element.style.top = `${newY}px`;
