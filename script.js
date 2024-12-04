@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextBtn = document.querySelector('.next-btn');
     const addTextBtn = document.getElementById('add-text-btn');
     const textEditor = document.querySelector('.text-editor');
+    const dots = document.querySelectorAll('.dot');
     
     let currentSlide = 0;
     let selectedText = null;
@@ -18,15 +19,38 @@ document.addEventListener('DOMContentLoaded', () => {
         slider.style.transform = `translateX(-${currentSlide * 33.333}%)`;
     }
 
+    function updateDots() {
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentSlide);
+        });
+    }
+
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            currentSlide = index;
+            updateSlidePosition();
+            updateDots();
+        });
+    });
+
+    function updateSlidePosition() {
+        slider.style.transform = `translateX(-${currentSlide * 33.333}%)`;
+        updateDots();
+    }
+
     prevBtn.addEventListener('click', () => {
-        currentSlide = Math.max(currentSlide - 1, 0);
-        updateSlider();
+        if (currentSlide > 0) {
+            currentSlide--;
+            updateSlidePosition();
+        }
         deselectText();
     });
 
     nextBtn.addEventListener('click', () => {
-        currentSlide = Math.min(currentSlide + 1, slides.length - 1);
-        updateSlider();
+        if (currentSlide < slides.length - 1) {
+            currentSlide++;
+            updateSlidePosition();
+        }
         deselectText();
     });
 
@@ -76,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        updateSlider();
+        updateSlidePosition();
         deselectText();
     }
 
