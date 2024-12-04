@@ -24,19 +24,16 @@ body {
     max-width: 450px;
     margin: 0 auto;
     aspect-ratio: 9/16;
-    overflow: hidden;
 }
 
-.image-slider {
-    display: flex;
-    width: 300%;
+.swiper {
+    width: 100%;
     height: 100%;
-    transition: transform 0.3s ease-in-out;
 }
 
-.slide {
+.swiper-slide {
     position: relative;
-    width: 33.333%;
+    width: 100%;
     height: 100%;
 }
 
@@ -49,12 +46,6 @@ body {
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
-}
-
-.slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
 }
 
 .text-container {
@@ -73,7 +64,6 @@ body {
     cursor: move;
     user-select: none;
     pointer-events: auto;
-    /* background-color: rgba(255, 255, 255, 0.1); */
     border: 1px dashed transparent;
     white-space: nowrap;
     min-width: fit-content;
@@ -87,54 +77,30 @@ body {
     border-color: #007bff;
 }
 
-.nav-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: rgba(255, 255, 255, 0.7);
-    border: none;
-    padding: 15px;
-    cursor: pointer;
-    z-index: 10;
+/* Swiper Navigation Buttons */
+.swiper-button-prev,
+.swiper-button-next {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.3);
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
 }
 
-.nav-btn:hover {
-    background-color: rgba(255, 255, 255, 0.9);
+.swiper-button-prev:after,
+.swiper-button-next:after {
+    font-size: 20px;
 }
 
-.prev-btn {
-    left: 10px;
-}
-
-.next-btn {
-    right: 10px;
-}
-
-.slide-dots {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
-    z-index: 10;
-}
-
-.dot {
+/* Swiper Pagination */
+.swiper-pagination-bullet {
     width: 10px;
     height: 10px;
-    border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.5);
-    cursor: pointer;
-    transition: all 0.3s ease;
+    opacity: 1;
 }
 
-.dot:hover {
-    background-color: rgba(255, 255, 255, 0.8);
-}
-
-.dot.active {
+.swiper-pagination-bullet-active {
     background-color: white;
     transform: scale(1.2);
 }
