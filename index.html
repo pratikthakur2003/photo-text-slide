@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Text Swipe</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="slider-container">
+            <button class="nav-btn prev-btn"><i class="fas fa-chevron-left"></i></button>
+            <div class="image-slider">
+                <div class="slide">
+                    <img src="https://picsum.photos/900/1600" alt="Image 1">
+                    <div class="text-container"></div>
+                </div>
+                <div class="slide">
+                    <img src="https://picsum.photos/900/1600" alt="Image 2">
+                    <div class="text-container"></div>
+                </div>
+                <div class="slide">
+                    <img src="https://picsum.photos/900/1600" alt="Image 3">
+                    <div class="text-container"></div>
+                </div>
+            </div>
+            <button class="nav-btn next-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+
+        <div class="controls">
+            <button id="add-text-btn">Add Text</button>
+            <div class="text-editor" style="display: none;">
+                <select id="font-family">
+                    <option value="Arial">Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Courier New">Courier New</option>
+                </select>
+                <select id="font-size">
+                    <option value="16">16px</option>
+                    <option value="20">20px</option>
+                    <option value="24">24px</option>
+                    <option value="32">32px</option>
+                    <option value="48">48px</option>
+                </select>
+                <input type="color" id="font-color" value="#000000">
+                <button id="bold-btn"><i class="fas fa-bold"></i></button>
+                <button id="italic-btn"><i class="fas fa-italic"></i></button>
+                <button id="underline-btn"><i class="fas fa-underline"></i></button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
